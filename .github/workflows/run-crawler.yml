@@ -38,3 +38,7 @@ jobs:
         env:
           MONGODB_URL: ${{ secrets.MONGODB_URL }}
         run: node crawler.js
+      - name: Run low50
+        env:
+          MONGODB_URL: ${{ secrets.MONGODB_URL }}
+        run: node low50.js
