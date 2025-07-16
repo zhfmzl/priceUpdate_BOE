@@ -165,16 +165,19 @@ const ovrPriceLow50 = async (List, OVR) => {
       const priceBraw =
         b?.player?.선수정보?.prices?.prices?.[gradeIndexB]?.price;
 
-      if (!priceAraw || !priceBraw) return 0;
+      // 값이 없거나 "0"이면 없는 것으로 간주
+      const isInvalidPrice = (price) =>
+        price === undefined || price === null || price === "0" || price === 0;
 
-      const priceA = HanTools.parseNumber(priceAraw.replace(/,/g, ""));
-      const priceB = HanTools.parseNumber(priceBraw.replace(/,/g, ""));
+      const hasPriceA = !isInvalidPrice(priceAraw);
+      const hasPriceB = !isInvalidPrice(priceBraw);
 
-      // console.log(
-      //   "a:b:",
-      //   a?.player?.선수정보?.prices,
-      //   b?.player?.선수정보?.prices
-      // );
+      if (!hasPriceA && !hasPriceB) return 0;
+      if (!hasPriceA) return 1;
+      if (!hasPriceB) return -1;
+
+      const priceA = HanTools.parseNumber(String(priceAraw).replace(/,/g, ""));
+      const priceB = HanTools.parseNumber(String(priceBraw).replace(/,/g, ""));
 
       return priceA - priceB;
     } catch (err) {
@@ -182,6 +185,7 @@ const ovrPriceLow50 = async (List, OVR) => {
       return 0;
     }
   });
+
   ovrList = ovrList.slice(0, 50);
 
   await OvrPriceLow.updateOne(
