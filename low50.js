@@ -121,11 +121,16 @@ const playerSearch = async (selectedSeason = "", minOvr = 0) => {
     playerReports = playerReports.concat(playerReport);
   }
 
-  return playerReports;
+  const filteredPlayerReports = playerReports.filter(
+    (player) => !playerRestrictions.includes(Number(player.id))
+  );
+
+  return filteredPlayerReports;
 };
 
 const ovrPriceLow50 = async (List, OVR) => {
   const list = [...List];
+
   let ovrList = [];
   for (let player of list) {
     if (player.능력치.포지션능력치.최고능력치 === OVR) {
