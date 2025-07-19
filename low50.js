@@ -171,8 +171,15 @@ const ovrPriceLow50 = async (List, OVR) => {
         b?.player?.선수정보?.prices?.prices?.[gradeIndexB]?.price;
 
       // 값이 없거나 "0"이면 없는 것으로 간주
-      const isInvalidPrice = (price) =>
-        price === undefined || price === null || price === "0" || price === 0;
+      const isInvalidPrice = (price) => {
+        const trimmed = String(price).trim();
+        return (
+          price === undefined ||
+          price === null ||
+          trimmed === "0" ||
+          Number(trimmed) === 0
+        );
+      };
 
       const hasPriceA = !isInvalidPrice(priceAraw);
       const hasPriceB = !isInvalidPrice(priceBraw);
@@ -192,6 +199,8 @@ const ovrPriceLow50 = async (List, OVR) => {
   });
 
   ovrList = ovrList.slice(0, 50);
+
+  console.log("ovrList:", ovrList);
 
   await OvrPriceLow.updateOne(
     { ovr: Number(OVR) },
@@ -222,7 +231,7 @@ async function main() {
       202, 225, 207, 246, 814, 231, 836,
     ]); // playerSearch(시즌넘버, 최소오버롤)
 
-    for (let i = 105; i <= 130; i++) {
+    for (let i = 90; i <= 130; i++) {
       await ovrPriceLow50(LIST, i);
     }
 
