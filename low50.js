@@ -121,16 +121,11 @@ const playerSearch = async (selectedSeason = "", minOvr = 0) => {
     playerReports = playerReports.concat(playerReport);
   }
 
-  const filteredPlayerReports = playerReports.filter(
-    (player) => !playerRestrictions.includes(Number(player.id))
-  );
-
-  return filteredPlayerReports;
+  return playerReports;
 };
 
 const ovrPriceLow50 = async (List, OVR) => {
   const list = [...List];
-
   let ovrList = [];
   for (let player of list) {
     if (player.능력치.포지션능력치.최고능력치 === OVR) {
@@ -170,26 +165,16 @@ const ovrPriceLow50 = async (List, OVR) => {
       const priceBraw =
         b?.player?.선수정보?.prices?.prices?.[gradeIndexB]?.price;
 
-      // 값이 없거나 "0"이면 없는 것으로 간주
-      const isInvalidPrice = (price) => {
-        const trimmed = String(price).trim();
-        return (
-          price === undefined ||
-          price === null ||
-          trimmed === "0" ||
-          Number(trimmed) === 0
-        );
-      };
+      if (!priceAraw || !priceBraw) return 0;
 
-      const hasPriceA = !isInvalidPrice(priceAraw);
-      const hasPriceB = !isInvalidPrice(priceBraw);
+      const priceA = HanTools.parseNumber(priceAraw.replace(/,/g, ""));
+      const priceB = HanTools.parseNumber(priceBraw.replace(/,/g, ""));
 
-      if (!hasPriceA && !hasPriceB) return 0;
-      if (!hasPriceA) return 1;
-      if (!hasPriceB) return -1;
-
-      const priceA = HanTools.parseNumber(String(priceAraw).replace(/,/g, ""));
-      const priceB = HanTools.parseNumber(String(priceBraw).replace(/,/g, ""));
+      // console.log(
+      //   "a:b:",
+      //   a?.player?.선수정보?.prices,
+      //   b?.player?.선수정보?.prices
+      // );
 
       return priceA - priceB;
     } catch (err) {
@@ -197,10 +182,7 @@ const ovrPriceLow50 = async (List, OVR) => {
       return 0;
     }
   });
-
   ovrList = ovrList.slice(0, 50);
-
-  console.log("ovrList:", ovrList);
 
   await OvrPriceLow.updateOne(
     { ovr: Number(OVR) },
@@ -225,13 +207,13 @@ async function main() {
     // --------------------------------------  22HR,23HR,23HW,24EP,24HR,25HR,24KB,25KL,2012KH,BDO,BLD,BTB,CAP,CC,ChelseaAmbassador,COC,CU,DC,EBS,FA,FCA,GR,GRU,HG,HOT,JNM,JVA,LE,LH,LivepoolAmbassador,LN,LOL,MC,MDL,MOG,NHD,NO7,NTG,OTW,RMCF,RTN,SPL,TB,TC,TKI,TKL,TT,UP,UT,VTR,WB--------------------------------------
 
     const LIST = await playerSearch([
-      261, 281, 291, 826, 811, 835, 830, 516, 247, 827, 828, 253, 256, 252, 289,
-      254, 217, 825, 802, 251, 264, 290, 210, 829, 283, 216, 813, 801, 840, 234,
-      236, 268, 265, 237, 821, 233, 201, 839, 249, 218, 274, 284, 270, 206, 214,
-      202, 225, 207, 246, 814, 231, 836,
+      101, 100, 261, 281, 291, 826, 811, 835, 830, 516, 247, 827, 828, 253, 256,
+      252, 289, 254, 217, 825, 802, 251, 264, 290, 210, 829, 283, 216, 813, 801,
+      840, 234, 236, 268, 265, 237, 821, 233, 201, 839, 249, 218, 274, 284, 270,
+      206, 214, 202, 225, 207, 246, 814, 231, 836,
     ]); // playerSearch(시즌넘버, 최소오버롤)
 
-    for (let i = 90; i <= 130; i++) {
+    for (let i = 105; i <= 132; i++) {
       await ovrPriceLow50(LIST, i);
     }
 
